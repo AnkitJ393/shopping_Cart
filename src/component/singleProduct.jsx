@@ -28,10 +28,32 @@ const SingleProduct = ({product}) => {
                     }
                     <Rating rating={product.rating} />
 
-
                 </Card.Subtitle>
-                    <Button variant='danger'>Remove from Cart</Button>
-                    <Button disabled={!product.inStock}>{ !product.inStock ?'Out of Stock':'Add to Cart'}</Button>
+                    {cart.some((p)=>p.id===product.id)
+                     ?
+                        <Button 
+                            variant='danger'  
+                            onClick={()=>
+                                dispatch({
+                                    type:'REMOVE_FROM_CART',
+                                    payload:product
+                                })
+                            }>
+                            Remove from Cart
+                        </Button>
+                     :
+                        <Button
+                            disabled={!product.inStock}
+                            onClick={()=>
+                                dispatch({
+                                    type:'ADD_TO_CART',
+                                    payload:product
+                                })
+                            }>
+                            { !product.inStock ?'Out of Stock':'Add to Cart'}
+                        </Button>
+                     }
+                    
             </Card.Body>
         </Card>
     </div>
