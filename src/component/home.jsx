@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { CartState } from '../context/Context.'
 import SingleProduct from './singleProduct';
 import Filters from './fitler';
@@ -7,29 +7,43 @@ import './styles.css';
 const Home = () => {
   const { state: { products },productState:{byStock,byFastDelivery,byRating,sort,searchQuery} } = CartState();
 
-  const filteredProducts = useMemo(() => {
-    return products
-      .filter((prod) => 
-      (!byStock || prod.inStock) && 
-        (!byFastDelivery || prod.fastDelivery) &&
-        (byRating ? prod.rating >= byRating : true)
-      )
-      .filter((prod) => 
-        searchQuery ? prod.name.toLowerCase().includes(searchQuery.toLowerCase()) : true
-      )
-      .sort((a, b) => 
-        sort === 'lowToHigh' ? a.price - b.price : sort === 'highToLow' ? b.price - a.price : 0
-      );
-  }, [products, byStock, byFastDelivery, byRating, sort, searchQuery]);
+  const transformProducts=()=>{
+    let sortedProducts=products;
+    
+    if(byFastDelivery){
+      sortedProducts=sortedProducts.filter((prod)=>prod.fastDelivery);
+    }
 
-  console.log(filteredProducts)
+    if(!byStock){
+      sortedProducts=sortedProducts.filter(prod=>prod.inStock);
+    }
+
+    if(byRating){
+      sortedProducts=sortedProducts.filter((prod)=>prod.rating >=byRating)
+    }
+
+    
+    if (sort) {
+      sortedProducts = sortedProducts.sort((a, b) =>
+        sort === "lowToHigh" ? a.price - b.price : sort==='highToLow'? b.price - a.price:null
+      );
+    }
+   
+
+    console.log(sortedProducts)
+    if(searchQuery){
+      sortedProducts=sortedProducts.filter((prod)=>prod.name.toLowerCase().includes(searchQuery));
+    }
+
+    return sortedProducts;
+  }
 
   return (
     <div className='home'>
         <Filters/>
         <div className="productContainer">
             {
-                filteredProducts.map((prod)=>{
+                transformProducts().map((prod)=>{
                  return   <SingleProduct product={prod} key={prod.id} />
                 })
             }
